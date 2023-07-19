@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     echo "<h3>Results:</h3>";
     echo "<p>Power: " . $power . " kWh</p>";
-    echo "<p>Rates: " . $rate / 100 . " Wh</p>";
+    echo "<p>Rates: RM " . $rate / 100 . "</p>";
 
     echo "<h3>Energy Consumption:</h3>";
     echo "<ul>";
