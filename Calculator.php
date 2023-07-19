@@ -82,31 +82,50 @@
         </form>
 
         <?php
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $voltage = (float) $_POST['voltage'];
-            $current = (float) $_POST['current'];
-            $rate = (float) $_POST['rate'];
+function calculateElectricityRates($voltage, $current, $rate)
+{
+    // Calculate power (kWh)
+    $power = ($voltage * $current) / 1000;
 
-            // Calculate power (Wh)
-            $power = ($voltage * $current)/1000;
+    $results = array();
 
-            echo "<h3>Results:</h3>";
-            echo "<p>Power: " . $power . " kWh</p>";
-            echo "<p>Rates: " . $rate/100 . " Wh</p>";
+    for ($hour = 1; $hour <= 24; $hour++) {
+        $energy = $power * $hour;
+        $totalCharge = ($energy * ($rate / 100));
+        $roundedTotalCharge = number_format($totalCharge, 2); // Round to two decimal places
 
-            // Calculate energy (kWh) and total charge for each hour
-            echo "<h3>Energy Consumption:</h3>";
-            echo "<ul>";
-            for ($hour = 1; $hour <= 24; $hour++) {
-                $energy = $power * $hour;
-                $totalCharge = ($energy * ($rate / 100));
-                $roundedTotalCharge = number_format($totalCharge, 2); // Round to two decimal places
+        $results[] = array(
+            'hour' => $hour,
+            'energy' => $energy,
+            'totalCharge' => $roundedTotalCharge
+        );
+    }
 
-                echo "<li>Hour: $hour | Energy: " . $energy . " | Total Charge: RM " . $roundedTotalCharge . "</li>";
-            }
-            echo "</ul>";
-        }
-        ?>
+    return $results;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $voltage = (float)$_POST['voltage'];
+    $current = (float)$_POST['current'];
+    $rate = (float)$_POST['rate'];
+
+    // Calculate power (kWh)
+    $power = ($voltage * $current) / 1000;
+
+    $results = calculateElectricityRates($voltage, $current, $rate);
+
+    echo "<h3>Results:</h3>";
+    echo "<p>Power: " . $power . " kWh</p>";
+    echo "<p>Rates: " . $rate / 100 . " Wh</p>";
+
+    echo "<h3>Energy Consumption:</h3>";
+    echo "<ul>";
+    foreach ($results as $result) {
+        echo "<li>Hour: " . $result['hour'] . " | Energy: " . $result['energy'] . " | Total Charge: RM " . $result['totalCharge'] . "</li>";
+    }
+    echo "</ul>";
+}
+?>
     </div>
 </body>
 </html>
